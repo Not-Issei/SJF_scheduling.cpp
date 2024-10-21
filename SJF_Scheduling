@@ -1,0 +1,59 @@
+#include <iostream>
+#include <algorithm> 
+using namespace std;
+
+struct Process {
+    int PID;        // Process ID
+    int burst;      // Burst Time
+    int waiting;    // Waiting Time
+    int turnaround; // Turnaround Time
+};
+bool compareByBurst(Process a, Process b) {
+    return a.burst < b.burst;
+}
+void calculateWaitingTime(Process proc[], int n) {
+    proc[0].waiting = 0; // First process has zero waiting time
+    for (int i = 1; i < n; i++) {
+        proc[i].waiting = proc[i - 1].waiting + proc[i - 1].burst;
+    }
+}
+void calculateTurnaroundTime(Process proc[], int n) {
+    for (int i = 0; i < n; i++) {
+        proc[i].turnaround = proc[i].waiting + proc[i].burst;
+    }
+}
+void sjfScheduling(Process proc[], int n) {
+    sort(proc, proc + n, compareByBurst);
+    calculateWaitingTime(proc, n);
+    calculateTurnaroundTime(proc, n);
+    cout << "PID\tBurst Time\tWaiting Time\tTurnaround Time\n";
+    for (int i = 0; i < n; i++) {
+        cout << proc[i].pid << "\t" << proc[i].burst << "\t\t" 
+             << proc[i].waiting << "\t\t" << proc[i].turnaround << endl;
+    }
+    float avgWaiting = 0, avgTurnaround = 0;
+    for (int i = 0; i < n; i++) {
+        avgWaiting += proc[i].waiting;
+        avgTurnaround += proc[i].turnaround;
+    }
+    avgWaiting /= n;
+    avgTurnaround /= n;
+    cout << "Average Waiting Time: " << avgWaiting << endl;
+    cout << "Average Turnaround Time: " << avgTurnaround << endl;
+}
+
+int main() {
+    int n;
+    cout << "Enter the number of processes: ";
+    cin >> n;
+
+    Process proc[n];
+
+    for (int i = 0; i < n; i++) {
+        proc[i].pid = i + 1;
+        cout << "Enter the burst time for Process " << proc[i].pid << ": ";
+        cin >> proc[i].burst;
+    }
+    sjfScheduling(proc, n);
+    return 0;
+}
